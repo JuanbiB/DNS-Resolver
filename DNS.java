@@ -21,13 +21,13 @@ class DNS {
       class representing a single DNS resource record
     */
     class ResourceRecord {
-	int type;
-	int iclass;
-	int ttl;
-	int datalen;
-	int length;  // number of bytes in the resource record
-	String name;
-	String value;
+		int type;
+		int iclass;
+		int ttl;
+		int datalen;
+		int length;  // number of bytes in the resource record
+		String name;
+		String value;
 
 	/*
 	  ResourceRecord constructor
@@ -88,29 +88,29 @@ class DNS {
       constructs a DNS object from a byte array received from a DNS server
      */
     public DNS(byte[] arr){
-	id = ((arr[0]<<8)&0xff00) + (arr[1]&0xff);
-	flags = ((arr[2]<<8)&0xff00) + (arr[3]&0xff);
-	qcount = ((arr[4]<<8)&0xff00) + (arr[5]&0xff);
-	acount = ((arr[6]<<8)&0xff00) + (arr[7]&0xff);
-	authcount = ((arr[8]<<8)&0xff00) + (arr[9]&0xff);
-	othercount = ((arr[10]<<8)&0xff00) + (arr[11]&0xff);
-	int tcount = qcount+acount+authcount+othercount;
-	int bindex = 12;
-	int k = 0;
-	// process question records
-	while(bindex<arr.length && k<qcount){
-	    ResourceRecord rr = new ResourceRecord(arr,bindex,QUESTION);
-	    bindex += rr.length;
-	    rrlist.add(rr);
-	    k++;
-	}
-	// process all other records
-	while(bindex<arr.length && k<tcount){
-	    ResourceRecord rr = new ResourceRecord(arr,bindex);
-	    bindex += rr.length;
-	    rrlist.add(rr);
-	    k++;
-	}
+		id = ((arr[0]<<8)&0xff00) + (arr[1]&0xff);
+		flags = ((arr[2]<<8)&0xff00) + (arr[3]&0xff);
+		qcount = ((arr[4]<<8)&0xff00) + (arr[5]&0xff);
+		acount = ((arr[6]<<8)&0xff00) + (arr[7]&0xff);
+		authcount = ((arr[8]<<8)&0xff00) + (arr[9]&0xff);
+		othercount = ((arr[10]<<8)&0xff00) + (arr[11]&0xff);
+		int tcount = qcount+acount+authcount+othercount;
+		int bindex = 12;
+		int k = 0;
+		// process question records
+		while(bindex<arr.length && k<qcount){
+		    ResourceRecord rr = new ResourceRecord(arr,bindex,QUESTION);
+		    bindex += rr.length;
+		    rrlist.add(rr);
+		    k++;
+		}
+		// process all other records
+		while(bindex<arr.length && k<tcount){
+		    ResourceRecord rr = new ResourceRecord(arr,bindex);
+		    bindex += rr.length;
+		    rrlist.add(rr);
+		    k++;
+		}
     }
 
     public String toString(){
