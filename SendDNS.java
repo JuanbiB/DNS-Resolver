@@ -98,8 +98,8 @@ class SendDNS {
 		String line;
 		byte[] inBuffer = new byte[1000];
 	
-	        DatagramPacket outPacket = new DatagramPacket(new byte[1],1,serverAddress,DNSPORT);
-	        DatagramPacket inPacket = new DatagramPacket(inBuffer,1000);
+	    DatagramPacket outPacket = new DatagramPacket(new byte[1],1,serverAddress,DNSPORT);
+	    DatagramPacket inPacket = new DatagramPacket(inBuffer,1000);
 	
 		// construct the query message in a byte array
 		byte[] query = new byte[1500];
@@ -114,7 +114,8 @@ class SendDNS {
 		for(int i=0; i<200; i++)
 		    dSocket.send(outPacket);
 	
-		// await the response 
+		// await the response
+		// TODO: Have it time out.
 		dSocket.receive(inPacket);
 	
 		byte[] answerbuf = inPacket.getData();
