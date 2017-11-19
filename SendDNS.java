@@ -49,7 +49,7 @@ class SendDNS {
 		}
 		return addr;
 	}
-	
+
 	static boolean isIpAddress(String s){
 		for (int i = 0; i < s.length(); i++){
 			if (Character.isLetter((s.charAt(i)))){
@@ -186,24 +186,33 @@ class SendDNS {
 					else if (rec.type == 2 && rec.value != null){
 						nsNames.add(rec.value);
 					}
+					// For reverse queries our answer is going to come in the way of a PTR package.
+					else if (rec.type == 12 && rec.value != null){
+						System.out.println("Reverse resolved from: " + hostname + " to " + rec.value);
+						return rec.value;
+					}
 				}
 				if (found) break;
 				/* There's no finding this chump. No aliases to refer to and no name server to hit up. */
 				if (name_servers.isEmpty() && alias_servers.isEmpty()) {
+					// If we have name servers who's IP addresses we don't know.
 					if (!nsNames.isEmpty()){
-						String new_ns = resolveAddress(rootservers.get(0), nsNames.get(0), rootservers);
-						if (!new_ns.isEmpty()){
-							String ans = resolveAddress(new_ns, hostname, rootservers);
-							if (!ans.isEmpty()){
-								found_ip = ans;
-								found = true;
-								break;	
+						// We don't give up until one of th
+						while (found_ip.isEmpty()){
+							String new_ns = "";
+							while (new_ns.isEmpty()) { // Keep trying until we get one
+								if (nsNames.isEmpty()){ // If we look at all of them with no luck, we're done.
+									break;
+								}
+								System.out.println("looking!");
+								new_ns = resolveAddress(rootservers.get(0), nsNames.get(0), rootservers);
+								nsNames.remove(0);
+							}
+							if (!new_ns.isEmpty()){
+								found_ip = resolveAddress(new_ns, hostname, rootservers);
 							}
 						}
-						else {
-							System.out.println("Failed in getting name server address.");
-							return "";
-						}
+						return found_ip;
 					}
 					else if (!cNames.isEmpty()) {
 						System.out.println("Host " + originalHost + " with aliases: " + cNames.toString()
@@ -214,7 +223,7 @@ class SendDNS {
 					}
 					return "";
 				}
-				
+
 				serveraddr = null;
 				try {
 					/* If there's no aliases for this host. */
@@ -257,7 +266,8 @@ class SendDNS {
 
 		if (found && (OGHost.equals(originalHost))) {
 			System.out.println(originalHost + " resolved to: " + found_ip);
-			System.out.println("Aliases: " + cNames.toString());
+			if (!cNames.isEmpty())
+				System.out.println("Aliases: " + cNames.toString());
 		}
 		return found_ip;
 	}
@@ -291,7 +301,7 @@ class SendDNS {
 
 		DatagramPacket outPacket = new DatagramPacket(new byte[1], 1, serverAddress, DNSPORT);
 		DatagramPacket inPacket = new DatagramPacket(inBuffer, 1000);
-		
+
 		// Deciding whether we do reverse or not. 
 		boolean reverse = false;
 		if (isIpAddress(hostname)){
