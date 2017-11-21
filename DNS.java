@@ -150,12 +150,8 @@ class DNS {
 	qarr[1] = (byte)(queryid & 0xff);
 	
 	if (recurse) {
-	    System.out.println("recursion requested");
-	    qarr[7] = (byte) (qarr[2] | 0x1);
-	    System.out.println(qarr[2]);
+	    qarr[2] = (byte) 1;
 	}
-	
-	
 	// set question count = 1
 	qarr[5] = 1;
 	
